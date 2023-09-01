@@ -2,14 +2,18 @@ import React, {useEffect} from 'react'
 import { useWebsitesContext } from "../hooks/useWebsitesContext"
 import { useAuthContext } from "../hooks/useAuthContext"
 import WebsiteDetails from './WebsiteDetails'
-import { Typography, Box } from '@mui/material'
+import { Box } from '@mui/material'
 
 const Dashboard = () => {
 
 	const {websites, dispatch} = useWebsitesContext()
 	const {user} = useAuthContext()
 
+	
+	const interval = 60 * 1000 // 30 secs
+
 	useEffect(() => {
+
 		const fetchWebsites = async () => {
 			const response = await fetch('/api/websites', {
 				headers: {
@@ -17,17 +21,19 @@ const Dashboard = () => {
 				}
 			})
 			const json = await response.json()
-
+	
 			if (response.ok) {
 				dispatch({type: 'SET_WEBSITES', payload: json})
 			}
-
 		}
+	
+		
 		if (user) {
-			fetchWebsites()
+			fetchWebsites();
+			setInterval(fetchWebsites, interval)
 		}
 		
-	}, [dispatch, user]) //dependancy array
+	}, [dispatch, user, interval]) //dependancy array
 
   return (
 	<Box className="home" m="1.5rem 2rem">

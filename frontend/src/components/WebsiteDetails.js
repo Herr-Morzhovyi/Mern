@@ -1,9 +1,8 @@
 import { useWebsitesContext } from "../hooks/useWebsitesContext"
 import { useAuthContext } from "../hooks/useAuthContext"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Box, Card, CardContent, Typography, useTheme, CardActions, Collapse, Button } from '@mui/material'
 // datefns
-import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import { Link } from "react-router-dom"
 
 const WebsiteDetails = ({ website }) => {
@@ -12,10 +11,6 @@ const WebsiteDetails = ({ website }) => {
 
 	const {dispatch} = useWebsitesContext()
 	const {user} = useAuthContext()
-
-	useEffect(() => {
-		
-	})
 
 	const handleClick = async () => {
 
@@ -34,7 +29,6 @@ const WebsiteDetails = ({ website }) => {
 		}
 	}
 
-	
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	

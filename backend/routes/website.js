@@ -4,7 +4,8 @@ const {
 	getAllWebsites,
 	getWebsite,
 	deleteWebsite,
-	updateWebsite
+	updateWebsite,
+	renewWebsite
 } = require('../controllers/websiteController')
 
 const  requireAuth = require('../middleware/requireAuth')
@@ -19,6 +20,8 @@ router.use(requireAuth)
 router.get('/', getAllWebsites) // no need to ()
 // GET singular
 router.get('/:id', getWebsite)
+
+router.get('/:id/renew', renewWebsite)
 // POST
 router.post('/', createWebsite)
 // Delete

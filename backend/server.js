@@ -4,7 +4,6 @@ const express = require('express')
 const mongoose = require('mongoose')
 const websiteRoutes = require('./routes/website')
 const userRoutes = require('./routes/users')
-const updateRoute = require('./routes/websiteUpdate')
 const Website = require('./models/Website')
 
 
@@ -19,20 +18,23 @@ app.use((req, res, next) => {
 	next()
 })
 
-const interval = 60 * 1000
+const interval = 60 * 1000 // 1 minute
 
 // routes
 app.use('/api/websites', websiteRoutes)
 app.use('/api/user', userRoutes)
 
-const sixHoursAgo = new Date(Date.now() - 2 * 60 * 1000)
+
 
 setInterval(async () => {
 	try {
+
+		const sixHoursAgo = new Date(Date.now() - 60 * 60 * 1000) // 6 hours
+
 		const websites = await Website.find({
 			lastUpdateTime: { $lt: sixHoursAgo }
 		}).limit(1);
-  
+	
 		for (const website of websites) {
 			try {
 				const response = await fetch(website.url + '/wp-json/rx-api/v1/get-wp-data');
@@ -48,6 +50,8 @@ setInterval(async () => {
 				
 				await website.save();
 				console.log(`Website updated ${website.title}`)
+
+
 			} catch (error) {
 				console.error(`Error fetching data for ${website.title}:`, error);
 			}
@@ -57,6 +61,7 @@ setInterval(async () => {
 	} catch (error) {
 		console.error('Error updating data:', error);
 	}
+
 }, interval)
 
 // Connect to DB

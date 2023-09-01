@@ -18,6 +18,9 @@ const getWebsite = async (req, res) => {
 		return res.status(404).json({error: 'No such Website'})
 	}
 
+
+
+
 	const website = await Website.findById(id)
 
 	if (!website) {
@@ -105,6 +108,8 @@ const updateWebsite = async (req, res) => {
 			website.history.shift()
 		}
 
+		website.lastUpdateTime = new Date()
+
 		await website.save()
 
 		res.json({ message: 'Data updated successfully' })
@@ -120,10 +125,53 @@ const updateWebsite = async (req, res) => {
 	
 }
 
+const renewWebsite = async (req, res) => {
+	const {id} = req.params
+
+	if (!mongoose.Types.ObjectId.isValid(id)) {
+		return res.status(404).json({error: 'No such Website'})
+	}
+
+	
+
+
+	try {
+		const website = await Website.findById(id)
+
+		const response = await fetch(website.url + '/wp-json/rx-api/v1/get-wp-data')
+		const newData = await response.json()
+
+		if (!website) {
+			return res.status(400).json({error: 'No such Website'})
+		}
+
+		website.history.push({ jsonData: newData })
+
+		if (website.history.length > 60) {
+			website.history.shift()
+		}
+
+		website.lastUpdateTime = new Date()
+
+		await website.save()
+
+		res.json({ message: 'Data updated successfully', website: website })
+
+		console.log('Data updated successfully')
+	} catch (error) {
+
+		console.error('Error updating data:', error)
+		res.status(500).json({ message: 'An error occurred', error: error })
+
+	}
+
+}
+
 module.exports = {
 	createWebsite,
 	getAllWebsites,
 	getWebsite,
 	deleteWebsite,
-	updateWebsite
+	updateWebsite,
+	renewWebsite
 }
